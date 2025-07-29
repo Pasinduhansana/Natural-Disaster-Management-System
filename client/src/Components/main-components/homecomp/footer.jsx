@@ -55,11 +55,11 @@ export default function Footer() {
           </div>
 
           {/* Solutions */}
-          <div>
-            <h4 className="font-medium text-sm text-slate-900 mb-4">
+          <div className="lg:ml-10">
+            <h4 className="font-medium text-sm text-slate-900 mb-4 lg:text-left ">
               Solutions
             </h4>
-            <ul className="space-y-2 text-xs text-slate-700">
+            <ul className="space-y-2 text-xs text-slate-700 lg:text-left">
               <li>
                 <a href="/solutions/flood" className="hover:text-green-500">
                   Flood Management
@@ -91,44 +91,12 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Company */}
-          <div>
-            <h4 className="font-medium text-sm text-slate-900 mb-4">Company</h4>
-            <ul className="space-y-2 text-xs text-slate-700">
-              <li>
-                <a href="/about" className="hover:text-green-500">
-                  About Us
-                </a>
-              </li>
-              <li>
-                <a href="/case-studies" className="hover:text-green-500">
-                  Case Studies
-                </a>
-              </li>
-              <li>
-                <a href="/careers" className="hover:text-green-500">
-                  Careers
-                </a>
-              </li>
-              <li>
-                <a href="/partners" className="hover:text-green-500">
-                  Partners
-                </a>
-              </li>
-              <li>
-                <a href="/contact" className="hover:text-green-500">
-                  Contact
-                </a>
-              </li>
-            </ul>
-          </div>
-
           {/* Resources */}
-          <div>
-            <h4 className="font-medium text-sm text-slate-900 mb-4">
+          <div className="lg:ml-10">
+            <h4 className="font-medium text-sm text-slate-900 mb-4 lg:text-left">
               Resources
             </h4>
-            <ul className="space-y-2 text-xs text-slate-700">
+            <ul className="space-y-2 text-xs text-slate-700 lg:text-left">
               <li>
                 <a href="/resources/guides" className="hover:text-green-500">
                   Emergency Guides
@@ -152,6 +120,40 @@ export default function Footer() {
               <li>
                 <a href="/resources/api" className="hover:text-green-500">
                   API Documentation
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Company */}
+          <div className="lg:ml-10">
+            <h4 className="font-medium text-sm text-slate-900 mb-4 lg:text-left">
+              Company
+            </h4>
+            <ul className="space-y-2 text-xs text-slate-700 lg:text-left">
+              <li>
+                <a href="/about" className="hover:text-green-500">
+                  About Us
+                </a>
+              </li>
+              <li>
+                <a href="/case-studies" className="hover:text-green-500">
+                  Case Studies
+                </a>
+              </li>
+              <li>
+                <a href="/careers" className="hover:text-green-500">
+                  Careers
+                </a>
+              </li>
+              <li>
+                <a href="/partners" className="hover:text-green-500">
+                  Partners
+                </a>
+              </li>
+              <li>
+                <a href="/contact" className="hover:text-green-500">
+                  Contact
                 </a>
               </li>
             </ul>
