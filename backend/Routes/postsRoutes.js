@@ -1,7 +1,6 @@
 import express from "express";
 import {
   getAllPosts,
-  insertPosts,
   getPosts,
   updatePosts,
   deletePosts,
@@ -10,6 +9,7 @@ import {
   approvePost,
   getPostsByStatus,
   rejectPost,
+  insertPosts,
 } from "../Controllers/PostsController.js";
 
 const postsrouter = express.Router();
