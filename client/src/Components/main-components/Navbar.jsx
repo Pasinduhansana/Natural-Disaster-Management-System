@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { useModal } from "../main-components/ModalContext";
+import icon from "../../assets/Shield.png";
 import {
   Home,
   Info,
@@ -10,9 +11,10 @@ import {
   LogOut,
   UserCircle,
   LayoutDashboard,
+  ShieldCheck,
   Users,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import default_profile from "../../assets/profile.png";
 
@@ -30,8 +32,36 @@ function Navbar() {
   const hideTimerRef = useRef(null);
   const navbarAreaRef = useRef(null);
 
+  const isHome = location.pathname === "/";
+
   // Close dropdown on outside click
   useEffect(() => {
+    // Set scroll state
+    const handleScroll = () => {
+      const scrolled = window.scrollY > 20;
+      setIsScrolled(scrolled);
+
+      if (isHome && window.scrollY < 100) {
+        // At the top of Home, always show navbar
+        setIsVisible(true);
+        clearTimeout(hideTimerRef.current);
+      } else {
+        if (window.scrollY > 100) {
+          setIsVisible(false);
+        }
+        // On scroll (any page), start auto-hide timer
+        clearTimeout(hideTimerRef.current);
+        hideTimerRef.current = setTimeout(() => setIsVisible(false), 2000);
+      }
+    };
+
+    // Initial check
+    window.addEventListener("scroll", handleScroll);
+    handleScroll(); // Initial checks
+
+    if (isHome) {
+      return;
+    }
     // Hide navbar after 3 seconds
     const hideTimer = setTimeout(() => setIsVisible(false), 3000);
     hideTimerRef.current = hideTimer;
@@ -43,14 +73,8 @@ function Navbar() {
       }
     };
 
-    // Set scroll state
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-
     // Add event listeners
     document.addEventListener("mousedown", handleClickOutside);
-    window.addEventListener("scroll", handleScroll);
 
     // Cleanup
     return () => {
@@ -58,7 +82,7 @@ function Navbar() {
       document.removeEventListener("mousedown", handleClickOutside);
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [isHome]);
 
   const handleMouseEnter = () => {
     clearTimeout(hideTimerRef.current);
@@ -140,6 +164,7 @@ function Navbar() {
         <div className="px-4 py-2.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
+              <ShieldCheck className="text-green-500 w-5 h-5 mr-2" />
               <span className="text-lg font-semibold bg-gradient-to-r from-emerald-600 to-green-500 bg-clip-text text-transparent">
                 Guardian Earth
               </span>

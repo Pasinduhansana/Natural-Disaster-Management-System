@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
+import { BentoGrid, BentoGridItem } from "../ui/bento-grid";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -75,7 +76,16 @@ export default function ViewDisasters() {
         throw new Error(data.message || "Failed to fetch disaster");
       }
 
-      setDisasterData(data || []);
+      // Use the freshly fetched data for filtering
+      const visibleDisasters = !isAuthenticated
+        ? (data.disasters || []).filter((d) => d.status === "Approved")
+        : (data.disasters || []).filter(
+            (d) =>
+              d.status === "Approved" ||
+              (d.status === "Pending" && d.email === user?.email)
+          );
+
+      setDisasterData(visibleDisasters || []);
     } catch (error) {
       toast.error("Error fetching disasters:", error.message);
       console.error("Error fetching disasters:", error.message);
@@ -277,137 +287,144 @@ export default function ViewDisasters() {
     );
   };
 
-  const GridCard = ({ data, navigate }) => {
-    return (
-      <div className="bg-white z-20 rounded-xl shadow-sm border border-gray-100 p-2 overflow-hidden hover:shadow-md transition-shadow duration-300">
-        <div className="flex flex-col justify-between h-full ">
-          <div className="flex flex-col">
-            <div className="border-b border-gray-100 pb-3 text-left">
-              {/* Header Details */}
-              <div className="flex w-full   items-center justify-between ">
-                <h2 className="text-lg font-semibold text-gray-900">
-                  {data.disasterType}
-                </h2>
-                <span
-                  className={`${getSeverityColor(
-                    data.severityLevel
-                  )} px-3 py-1 rounded-full text-xs font-medium`}
-                >
-                  {data.severityLevel}
-                </span>
-              </div>
-            </div>
-
-            <div className="relative my-3 h-[180px] lg:rounded-xl overflow-hidden w-auto max-h-[250px]">
-              <img
-                src={data.images}
-                alt={`Map showing location of ${data.Location || "this disaster"}`}
-                className="w-full object-cover rounded-xl"
-                loading="lazy"
-              />
-
-              <div className="absolute  top-0 right-0 backdrop-blur-md bg-white/30 border h-[50px] flex items-center border-white/20 shadow-lg rounded-xl p-3 m-2">
-                <div className="flex items-center gap-2 justify-center">
-                  <Users className="w-4  text-emerald-900" />
-                  <div className="flex flex-col text-left">
-                    <p className="text-[10px] font-normal text-emerald-900">
-                      Affected
-                    </p>
-                    <p className="text-[15px] font-semibold text-emerald-900">
-                      {data.numberOfPeopleAffected.toLocaleString()} Peoples
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="absolute bottom-0 left-0 right-0 p-3"></div>
-            </div>
-
-            <div className="flex border-t border-gray-200 flex-col justify-between items-center gap-5 w-full">
-              <div className="py-3 space-y-4 text-left w-full">
-                <div className="flex flex-row justify-between">
-                  <div className="flex items-center gap-2 ">
-                    <Calendar className="w-4 h-4 text-emerald-600 " />
-                    <div>
-                      <span className="text-[12px] font-bold text-gray-600">
-                        Date :
-                      </span>
-                      <p className="text-sm text-gray-600 text-wrap text-left ">
-                        {formatDate(data.date)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 ">
-                    <Phone className="w-5 h-5 text-emerald-600" />
-                    <div>
-                      <span className="text-[12px] font-bold text-gray-600">
-                        Mobile :
-                      </span>
-
-                      <p className="text-sm text-gray-600 text-wrap text-left  ">
-                        {data.contact}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 ">
-                  <FileText className="w-4 h-4 text-emerald-600" />
-                  <div>
-                    <span className="text-[12px] font-bold text-gray-600">
-                      Description :
-                    </span>
-                    <p className="text-sm text-gray-600 text-wrap text-left w-full ">
-                      {data.description}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-emerald-600 mt-1  shrink-0" />
-                  <div>
-                    <span className="text-[12px] font-bold text-gray-600">
-                      Location :
-                    </span>
-                    <p className="text-sm text-gray-600 text-left">
-                      {data.Location}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="pt-3 pb-1 flex justify-end border-t gap-2">
-            {isAuthenticated && (
-              <>
-                <button
-                  onClick={() => {
-                    handleEdit(data);
-                  }}
-                  type="button"
-                  className="inline-flex items-center justify-around px-4 py-1 border w-[100px] h-[30px]  border-emerald-600 rounded-md text-xs font-medium text-emerald-700 bg-white hover:bg-emerald-50"
-                >
-                  <Edit className="w-3 h-3 mr-1" />
-                  Update
-                </button>
-                <button
-                  onClick={() => {
-                    handleDelte(data._id);
-                  }}
-                  type="button"
-                  className="inline-flex items-center justify-around px-4 py-1 border w-[100px] h-[30px] border-transparent rounded-md text-xs font-medium text-white bg-red-600 hover:bg-red-700"
-                >
-                  <Trash2 className="w-3 h-3 mr-1" />
-                  Delete
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
+  const Skeleton = ({ viewMode }) =>
+    viewMode === "list" ? (
+      <div className="flex flex-1 w-full h-full min-h-[6rem] rounded-xl bg-gradient-to-br from-neutral-200 dark:from-neutral-900 dark:to-neutral-800 to-neutral-100"></div>
+    ) : (
+      <div className="flex flex-1 w-[full] h-[400px] rounded-xl bg-gradient-to-br from-neutral-200 dark:from-neutral-900 dark:to-neutral-800 to-neutral-100"></div>
     );
-  };
+
+  // const GridCard = ({ data, navigate }) => {
+  //   return (
+  //     <div className="bg-white z-20 rounded-xl shadow-sm border border-gray-100 p-2 overflow-hidden hover:shadow-md transition-shadow duration-300">
+  //       <div className="flex flex-col justify-between h-full ">
+  //         <div className="flex flex-col">
+  //           <div className="border-b border-gray-100 pb-3 text-left">
+  //             {/* Header Details */}
+  //             <div className="flex w-full   items-center justify-between ">
+  //               <h2 className="text-lg font-semibold text-gray-900">
+  //                 {data.disasterType}
+  //               </h2>
+  //               <span
+  //                 className={`${getSeverityColor(
+  //                   data.severityLevel
+  //                 )} px-3 py-1 rounded-full text-xs font-medium`}
+  //               >
+  //                 {data.severityLevel}
+  //               </span>
+  //             </div>
+  //           </div>
+
+  //           <div className="relative my-3 h-[180px] lg:rounded-xl overflow-hidden w-auto max-h-[250px]">
+  //             <img
+  //               src={data.images}
+  //               alt={`Map showing location of ${data.Location || "this disaster"}`}
+  //               className="w-full object-cover rounded-xl"
+  //               loading="lazy"
+  //             />
+
+  //             <div className="absolute  top-0 right-0 backdrop-blur-md bg-white/30 border h-[50px] flex items-center border-white/20 shadow-lg rounded-xl p-3 m-2">
+  //               <div className="flex items-center gap-2 justify-center">
+  //                 <Users className="w-4  text-emerald-900" />
+  //                 <div className="flex flex-col text-left">
+  //                   <p className="text-[10px] font-normal text-emerald-900">
+  //                     Affected
+  //                   </p>
+  //                   <p className="text-[15px] font-semibold text-emerald-900">
+  //                     {data.numberOfPeopleAffected.toLocaleString()} Peoples
+  //                   </p>
+  //                 </div>
+  //               </div>
+  //             </div>
+
+  //             <div className="absolute bottom-0 left-0 right-0 p-3"></div>
+  //           </div>
+
+  //           <div className="flex border-t border-gray-200 flex-col justify-between items-center gap-5 w-full">
+  //             <div className="py-3 space-y-4 text-left w-full">
+  //               <div className="flex flex-row justify-between">
+  //                 <div className="flex items-center gap-2 ">
+  //                   <Calendar className="w-4 h-4 text-emerald-600 " />
+  //                   <div>
+  //                     <span className="text-[12px] font-bold text-gray-600">
+  //                       Date :
+  //                     </span>
+  //                     <p className="text-sm text-gray-600 text-wrap text-left ">
+  //                       {formatDate(data.date)}
+  //                     </p>
+  //                   </div>
+  //                 </div>
+  //                 <div className="flex items-center gap-2 ">
+  //                   <Phone className="w-5 h-5 text-emerald-600" />
+  //                   <div>
+  //                     <span className="text-[12px] font-bold text-gray-600">
+  //                       Mobile :
+  //                     </span>
+
+  //                     <p className="text-sm text-gray-600 text-wrap text-left  ">
+  //                       {data.contact}
+  //                     </p>
+  //                   </div>
+  //                 </div>
+  //               </div>
+
+  //               <div className="flex items-center gap-2 ">
+  //                 <FileText className="w-4 h-4 text-emerald-600" />
+  //                 <div>
+  //                   <span className="text-[12px] font-bold text-gray-600">
+  //                     Description :
+  //                   </span>
+  //                   <p className="text-sm text-gray-600 text-wrap text-left w-full ">
+  //                     {data.description}
+  //                   </p>
+  //                 </div>
+  //               </div>
+
+  //               <div className="flex items-center gap-2">
+  //                 <MapPin className="w-4 h-4 text-emerald-600 mt-1  shrink-0" />
+  //                 <div>
+  //                   <span className="text-[12px] font-bold text-gray-600">
+  //                     Location :
+  //                   </span>
+  //                   <p className="text-sm text-gray-600 text-left">
+  //                     {data.Location}
+  //                   </p>
+  //                 </div>
+  //               </div>
+  //             </div>
+  //           </div>
+  //         </div>
+
+  //         <div className="pt-3 pb-1 flex justify-end border-t gap-2">
+  //           {isAuthenticated && (
+  //             <>
+  //               <button
+  //                 onClick={() => {
+  //                   handleEdit(data);
+  //                 }}
+  //                 type="button"
+  //                 className="inline-flex items-center justify-around px-4 py-1 border w-[100px] h-[30px]  border-emerald-600 rounded-md text-xs font-medium text-emerald-700 bg-white hover:bg-emerald-50"
+  //               >
+  //                 <Edit className="w-3 h-3 mr-1" />
+  //                 Update
+  //               </button>
+  //               <button
+  //                 onClick={() => {
+  //                   handleDelte(data._id);
+  //                 }}
+  //                 type="button"
+  //                 className="inline-flex items-center justify-around px-4 py-1 border w-[100px] h-[30px] border-transparent rounded-md text-xs font-medium text-white bg-red-600 hover:bg-red-700"
+  //               >
+  //                 <Trash2 className="w-3 h-3 mr-1" />
+  //                 Delete
+  //               </button>
+  //             </>
+  //           )}
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // };
 
   return (
     <>
@@ -429,12 +446,12 @@ export default function ViewDisasters() {
               }}
             ></div>
           </div>
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-8">
             <div className="flex flex-col justify-start text-left ml-2">
-              <h1 className="text-2xl font-semibold text-gray-700">
+              <h1 className="text-2xl mt-2 font-semibold text-gray-700">
                 Disaster Reports
               </h1>
-              <p className="text-sm text-gray-400 mt-0">
+              <p className="text-sm text-gray-400 mt-1">
                 Stay informed with the latest disaster updates and response
                 data.
               </p>
@@ -481,32 +498,54 @@ export default function ViewDisasters() {
           </div>
           <div
             className={`grid gap-6 ${
-              viewMode === "grid"
+              viewMode === "grid1"
                 ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 z-20"
                 : "grid-cols-1 z-20"
             }`}
           >
-            {disasterData.disasters && disasterData.disasters.length > 0 ? (
-              disasterData.disasters.map((disaster) =>
-                viewMode === "list" ? (
+            {loading ? (
+              // Show 6 skeletons for grid, or 1 for list
+              viewMode === "grid" ? (
+                Array.from({ length: 6 }).map((_, i) => (
+                  <Skeleton key={i} viewMode={viewMode} />
+                ))
+              ) : (
+                <Skeleton viewMode={viewMode} />
+              )
+            ) : viewMode === "list" ? (
+              disasterData && disasterData.length > 0 ? (
+                disasterData.map((disaster) => (
                   <ListCard
                     key={disaster._id}
                     data={disaster}
                     navigate={navigate}
                   />
-                ) : (
-                  <GridCard
-                    key={disaster._id}
-                    data={disaster}
-                    navigate={navigate}
-                  />
-                )
+                ))
+              ) : (
+                <p className="text-gray-500">No disaster reports available.</p>
               )
+            ) : disasterData && disasterData.length > 0 ? (
+              <BentoGrid className="w-full z-20">
+                {disasterData.map((disaster, i) => (
+                  <BentoGridItem
+                    key={disaster._id}
+                    title={disaster.disasterType}
+                    description={disaster.description}
+                    header={disaster.severityLevel}
+                    icon={disaster.images}
+                    data={disaster}
+                    type="user"
+                    navigation={navigate}
+                    className={i === 3 || i === 6 ? "md:col-span-2" : ""}
+                  />
+                ))}
+              </BentoGrid>
             ) : (
               <p className="text-gray-500">No disaster reports available.</p>
             )}
           </div>
         </div>
+
         <Modal
           isOpen={isAddModalOpen}
           onClose={() => {

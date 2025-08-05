@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "../ui/hover-card";
+import {
   ThumbsUp,
   MessageCircle,
   Share2,
@@ -17,6 +22,18 @@ import {
   Flame,
   Plus,
   Send,
+  CloudLightning,
+  CloudRain,
+  Tornado,
+  Search,
+  X,
+  TrendingUp,
+  ArrowUp,
+  ArrowDown,
+  Info,
+  Activity,
+  MapPin,
+  Award,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Modal from "../main-components/Model";
@@ -119,6 +136,7 @@ const PostView = () => {
   const [loading, setLoading] = useState(true);
   const [showComments, setShowComments] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const searchInputRef = useRef(null);
   const navigate = useNavigate();
   const currentUserId = "user1"; // Example, update accordingly
@@ -275,318 +293,922 @@ const PostView = () => {
   };
 
   const PostCard = ({ post, handleAddComment }) => (
-    <div className="relative border rounded-xl mix-w-[500px] shadow-sm mt-2 bg-white overflow-hidden">
+    <div className="bg-white rounded-xl shadow-sm mb-6 overflow-hidden border border-gray-100">
       {/* Header */}
-      <div className="mx-5 flex items-center border-b justify-between   border-gray-200">
+      <div className="flex items-center justify-between p-3">
         <div className="flex items-center space-x-3">
-          <div className="h-10 w-10 rounded-full bg-gradient-to-r from-primary-500 to-primary-600 flex items-center justify-center">
-            <AlertTriangle className="h-6 w-6 text-red-400" />
+          <div className="h-9 w-9 rounded-full bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
+            <AlertTriangle className="h-5 w-5 text-white" />
           </div>
           <div className="flex flex-col justify-start text-left">
-            <p className="font-semibold text-gray-900">{post.title}</p>
+            <p className="font-medium text-gray-900 text-sm">{post.title}</p>
             <p className="text-xs text-gray-500">
               {formatDate(post.createdAt)}
             </p>
           </div>
         </div>
 
-        <div className="p-4">
-          <div
-            className={`px-3 py-1 rounded-full text-sm ${
-              post.category === "Floods"
-                ? "bg-blue-100 text-blue-800"
-                : post.category === "Earthquakes"
-                  ? "bg-yellow-100 text-yellow-800"
-                  : post.category === "Landslides"
-                    ? "bg-green-100 text-green-800"
-                    : post.category === "Tornadoes"
-                      ? "bg-orange-100 text-orange-800"
-                      : post.category === "Wildfires"
-                        ? "bg-red-100 text-red-800"
-                        : post.category === "Hurricanes"
-                          ? "bg-indigo-100 text-indigo-800"
-                          : post.category === "Tsunami"
-                            ? "bg-cyan-100 text-cyan-800"
-                            : "bg-gray-100 text-gray-800"
-            }`}
-          >
-            {post.category}
-          </div>
+        <div
+          className={`px-2 py-1 rounded-full text-xs font-medium ${
+            post.category === "Floods"
+              ? "bg-blue-100 text-blue-700"
+              : post.category === "Earthquakes"
+                ? "bg-yellow-100 text-yellow-700"
+                : post.category === "Wildfires"
+                  ? "bg-red-100 text-red-700"
+                  : "bg-gray-100 text-gray-700"
+          }`}
+        >
+          {post.category}
         </div>
       </div>
 
       {/* Image */}
-      <div className="overflow-hidden relative rounded-md shadow-md group mx-5 mt-2">
+      <div className="relative">
         <img
           src={post.imageUrl}
           alt={post.title}
-          className="w-full aspect-[8/5] rounded-md shadow-md object-cover transition-transform duration-300 group-hover:scale-110"
+          className="w-full aspect-[4/3] object-cover"
         />
-        {post.disasterDate && (
-          <div className="absolute bottom-4 left-4 px-4 py-2 rounded-lg flex items-center space-x-2 bg-white/50 backdrop-blur-md border border-white/30 shadow-md">
-            <Clock className="h-4 w-4 text-primary-600" />
-            <span className="text-gray-900 text-sm font-medium">
-              Expected: {new Date(post.disasterDate).toLocaleDateString()}
+        {post.isUpcoming && (
+          <div className="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-medium bg-black/60 text-white backdrop-blur-sm flex items-center space-x-1">
+            <Clock className="h-3 w-3 mr-1" />
+            <span>
+              Upcoming: {new Date(post.disasterDate).toLocaleDateString()}
             </span>
+          </div>
+        )}
+        {post.status === "ongoing" && (
+          <div className="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-medium bg-red-500/80 text-white backdrop-blur-sm flex items-center space-x-1 animate-pulse">
+            <AlertTriangle className="h-3 w-3 mr-1" />
+            <span>LIVE</span>
           </div>
         )}
       </div>
 
+      {/* Content */}
+      <div className="p-4 text-left">
+        <h2 className="font-medium text-gray-900 text-base">{post.title}</h2>
+        <p className="mt-1 text-gray-600 text-sm line-clamp-2">
+          {post.description}
+        </p>
+      </div>
+
       {/* Actions */}
-      <div className="p-5">
-        <div className="flex items-center justify-between space-x-2">
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => handleLike(post._id)}
-              className={`interactive-button flex items-center space-x-1 transition-all duration-300 rounded-lg px-3 py-1 ${
-                post.likes.includes(currentUserId)
-                  ? "bg-red-100 text-red-500"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`}
-            >
-              <ThumbsUp className="h-4 w-4" />
-              <span className="text-[14px]">{post.likes.length}</span>
-            </button>
-            <button
-              onClick={() => toggleComments(post._id)}
-              className="interactive-button flex items-center space-x-1 text-gray-600 hover:bg-gray-100 transition-all duration-300 rounded-lg px-3 py-1"
-            >
-              <MessageCircle className="h-4 w-4" />
-              <span className="text-[14px]">{post.comments.length}</span>
-            </button>
-            <button className="interactive-button flex items-center space-x-1 text-gray-600 hover:bg-gray-100 transition-all duration-300 rounded-lg px-3 py-1 ml-auto">
-              <Share2 className="h-5 w-5" />
-            </button>
-          </div>
-
-          <div
-            className={`px-3 mr-3 py-1 rounded-full text-sm ${
-              post.isUpcoming
-                ? "bg-blue-100 text-blue-800"
-                : "bg-red-100/80 text-red-800"
-            } ${post.isUpcoming ? "pulse-animation" : ""}`}
+      <div className="px-4 py-3 border-t border-gray-100 flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={() => handleLike(post._id)}
+            className={`flex items-center ${
+              post.likes.includes(currentUserId)
+                ? "text-red-500"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
           >
-            {post.isUpcoming ? "Upcoming" : "Ongoing"}
+            <ThumbsUp className="h-5 w-5" />
+            <span className="ml-1 text-xs">{post.likes.length}</span>
+          </button>
+          <button
+            onClick={() => toggleComments(post._id)}
+            className="flex items-center text-gray-500 hover:text-gray-700"
+          >
+            <MessageCircle className="h-5 w-5" />
+            <span className="ml-1 text-xs">{post.comments.length}</span>
+          </button>
+          <button className="flex items-center text-gray-500 hover:text-gray-700">
+            <Share2 className="h-5 w-5" />
+          </button>
+        </div>
+
+        <button className="text-xs text-blue-600 font-medium">
+          See Details
+        </button>
+      </div>
+
+      {/* Comments Section */}
+      {showComments[post._id] && (
+        <div className="px-4 py-3 border-t border-gray-100 bg-gray-50">
+          {post.comments.map((comment, index) => (
+            <div key={index} className="flex space-x-2 mb-3 last:mb-0">
+              <div className="w-7 h-7 rounded-full bg-gray-200 flex-shrink-0"></div>
+              <div className="flex-1">
+                <p className="text-sm">
+                  <span className="font-medium text-gray-900">
+                    {comment.user}
+                  </span>{" "}
+                  <span className="text-gray-700">{comment.text}</span>
+                </p>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {formatDate(comment.createdAt)}
+                </p>
+              </div>
+            </div>
+          ))}
+
+          <div className="flex items-center mt-3 relative">
+            <input
+              type="text"
+              className="w-full text-sm border border-gray-200 rounded-full py-1.5 pl-3 pr-10 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              placeholder="Add a comment..."
+              id={`comment-input-${post._id}`}
+            />
+            <button
+              className="absolute right-2 text-blue-500"
+              onClick={() => {
+                const input = document.getElementById(
+                  `comment-input-${post._id}`
+                );
+                if (input && input.value.trim()) {
+                  handleAddComment(post._id, input.value);
+                  input.value = "";
+                }
+              }}
+            >
+              <Send className="h-4 w-4" />
+            </button>
           </div>
         </div>
+      )}
+    </div>
+  );
 
-        {/* Content */}
-        <div className="mt-4 text-left">
-          <h2 className="font-semibold text-gray-900 text-[16px]">
-            {post.title}
-          </h2>
-          <p className="mt-1 text-gray-600 text-[14px]">{post.description}</p>
-        </div>
+  const DisasterStories = () => (
+    <div className="w-full overflow-x-auto py-4 mb-6">
+      <div className="flex space-x-4 px-2">
+        {[
+          {
+            icon: <Flame className="text-red-500" />,
+            label: "Wildfires",
+            active: true,
+            count: 3,
+            description:
+              "Active wildfires across forests and residential areas",
+          },
+          {
+            icon: <Droplets className="text-blue-500" />,
+            label: "Floods",
+            count: 12,
+            description: "Flooding in coastal and riverine regions",
+          },
+          {
+            icon: <CloudLightning className="text-purple-500" />,
+            label: "Storms",
+            count: 7,
+            description: "Severe thunderstorms and weather warnings",
+          },
+          {
+            icon: <Wind className="text-yellow-600" />,
+            label: "Tornado",
+            count: 2,
+            description: "Tornado warnings and affected areas",
+          },
+          {
+            icon: <Shield className="text-green-500" />,
+            label: "Updates",
+            count: 5,
+            description: "Latest safety updates and recovery efforts",
+          },
+        ].map((story, index) => (
+          <HoverCard key={index} openDelay={200} closeDelay={100}>
+            <HoverCardTrigger asChild>
+              <button className="flex flex-col items-center focus:outline-none">
+                <div
+                  className={`w-16 h-16 rounded-full flex items-center justify-center ${story.active ? "ring-2 ring-offset-2 ring-red-500" : "ring-1 ring-gray-200"} mb-1 bg-gradient-to-br from-gray-50 to-gray-100 p-0.5 hover:shadow-md transition-all`}
+                >
+                  <div className="w-full h-full rounded-full flex items-center justify-center bg-white">
+                    {story.icon}
+                  </div>
+                </div>
+                <span className="text-xs text-gray-700">{story.label}</span>
+              </button>
+            </HoverCardTrigger>
 
-        <hr className="border-t border-gray-200 my-4" />
-
-        {/* Comments */}
-        {showComments[post._id] && (
-          <div className="mt-4 space-y-3">
-            {post.comments.map((comment, index) => (
-              <div
-                key={index}
-                className="flex space-x-2 text-left items-center bg-white rounded-[10px] shadow-sm"
-              >
-                <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200"></div>
-                <div className="flex-1 glass-card rounded-2xl p-3">
-                  <p className="font-medium text-sm text-gray-900">
-                    {comment.user}
-                  </p>
-                  <p className="text-sm text-gray-600">{comment.text}</p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    {formatDate(comment.createdAt)}
-                  </p>
+            <HoverCardContent className="w-64 p-0 shadow-lg bg-white">
+              <div className="p-3 border-b border-gray-100">
+                <div className="flex items-center">
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center bg-${story.icon.props.className.split("-")[1]}-50 mr-3`}
+                  >
+                    {story.icon}
+                  </div>
+                  <div className="text-left">
+                    <h4 className="font-medium text-gray-900">{story.label}</h4>
+                    <p className="text-xs text-gray-500">
+                      {story.count} active events
+                    </p>
+                  </div>
                 </div>
               </div>
-            ))}
 
-            {/* Comment input section */}
-            <div className="flex relative items-center space-x-2 mt-3">
-              <input
-                type="text"
-                className="w-full px-4 py-2 rounded-full border-[1px] text-[14px] border-green-200 focus:border-green-400 h-[38px] focus:outline-none focus:ring-0 focus:ring-green-200"
-                placeholder="Add a comment..."
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && e.target.value) {
-                    handleAddComment(post._id, e.target.value);
-                    e.target.value = "";
-                  }
-                }}
-                id={`comment-input-${post._id}`} // Unique ID for targeting
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  const input = document.getElementById(
-                    `comment-input-${post._id}`
-                  );
-                  if (input && input.value.trim()) {
-                    handleAddComment(post._id, input.value);
-                    input.value = ""; // Clear input after adding the comment
-                  }
-                }}
-                className="p-2 absolute right-2 rounded-full bg-green-600 hover:bg-green-700 transition text-white"
-              >
-                <Send className="w-3 h-3" />
-              </button>
-            </div>
-          </div>
-        )}
+              <div className="p-3">
+                <p className="text-sm text-left text-gray-600">
+                  {story.description}
+                </p>
+                <button className="mt-4 text-xs font-medium text-blue-600 hover:text-blue-700 flex items-center">
+                  View all {story.label.toLowerCase()}
+                  <svg
+                    className="w-3 h-3 ml-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </HoverCardContent>
+          </HoverCard>
+        ))}
       </div>
     </div>
   );
 
-  return (
-    <div className="min-h-screen bg-texture px-4 sm:px-6 lg:px-6 pt-0 ">
-      <div className=" mx-auto ">
-        {/* Fixed Header */}
-        <div className="fixed top-0 left-0 w-full z-50 bg-texture bg-white py-4">
-          <div className="flex justify-between items-center px-4">
-            <div className="flex flex-col justify-start text-left">
-              <h1 className="text-2xl font-semibold text-gray-700">
-                Disaster Community
-              </h1>
-              <p className="text-sm text-gray-400 mt-0">
-                Stay informed with the Community updates
-              </p>
+  const RightSidebar = () => {
+    // Sample data for the disaster trend chart
+    const chartData = {
+      months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+      data: [
+        { name: "Floods", values: [3, 5, 4, 7, 8, 12] },
+        { name: "Wildfires", values: [2, 1, 3, 4, 2, 3] },
+        { name: "Storms", values: [4, 3, 5, 6, 7, 7] },
+      ],
+    };
+
+    return (
+      <div className="sticky top-0 max-h-[calc(100vh-6rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-100 pr-2">
+        {/* Disaster Trends Chart */}
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-4">
+          {/* Chart Header with Gradient */}
+          <div className="bg-gradient-to-r from-slate-700 to-slate-800 p-2 text-white">
+            <div className="flex items-center justify-between text-left">
+              <div>
+                <h3 className="font-medium text-white">Disaster Trends</h3>
+                <p className="text-xs text-slate-300 mt-0.5">
+                  Incident frequency over time
+                </p>
+              </div>
+              <select className="text-xs border-0 rounded-md py-1 px-2 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 transition-colors focus:outline-none focus:ring-1 focus:ring-white/30">
+                <option>Last 6 months</option>
+                <option>Last year</option>
+                <option>All time</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Chart Content */}
+          <div className="p-4">
+            {/* Chart Grid */}
+            <div className="relative h-48 mb-2">
+              {/* Grid Lines */}
+              <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
+                {[0, 1, 2, 3].map((_, i) => (
+                  <div key={i} className="w-full h-px bg-gray-100"></div>
+                ))}
+              </div>
+
+              {/* Chart Bars */}
+              <div className="h-full flex items-end space-x-2">
+                {chartData.data[0].values.map((value, index) => (
+                  <div
+                    key={index}
+                    className="flex-1 flex flex-col items-center group"
+                  >
+                    <div className="w-full flex flex-col items-center space-y-0.5 relative">
+                      {/* Tooltip on hover */}
+                      <div className="absolute bottom-full mb-2 z-10 w-[100px] bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        Floods: {chartData.data[0].values[index]}
+                        <br />
+                        Wildfires: {chartData.data[1].values[index]}
+                        <br />
+                        Storms: {chartData.data[2].values[index]}
+                      </div>
+
+                      {/* Stacked bars with hover effect */}
+                      <div
+                        className="w-full bg-blue-400 rounded-t group-hover:bg-blue-500 transition-colors duration-200"
+                        style={{
+                          height: `${chartData.data[0].values[index] * 5}px`,
+                        }}
+                      ></div>
+                      <div
+                        className="w-full bg-red-400 rounded-t group-hover:bg-red-500 transition-colors duration-200"
+                        style={{
+                          height: `${chartData.data[1].values[index] * 5}px`,
+                        }}
+                      ></div>
+                      <div
+                        className="w-full bg-purple-400 rounded-t group-hover:bg-purple-500 transition-colors duration-200"
+                        style={{
+                          height: `${chartData.data[2].values[index] * 5}px`,
+                        }}
+                      ></div>
+                    </div>
+                    <span className="text-xs font-medium text-gray-600 mt-2">
+                      {chartData.months[index]}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className="flex items-center space-x-2 glassmorphism rounded-lg p-1">
-              <button
-                onClick={() => {
-                  setIsAddModalOpen(true);
-                }}
-                className=" hover:border-green-300 active:bg-green-100 z-10 w-[145px] h-[38px] mt-[1px] border border-gray-200 bg-white p-1 justify-center text-[#626262] hover:text-green-600 px-2 py-3 rounded-md transition-all duration-300 text-[14px] font-medium !rounded-button whitespace-nowrap cursor-pointer shadow-sm flex items-center"
+            {/* Summary Stats */}
+            <div className="mt-4 grid grid-cols-3 gap-2 border-t border-gray-100 pt-3">
+              <div className="text-center">
+                <p className="text-xs text-gray-500">Total Floods</p>
+                <p className="text-lg font-semibold text-blue-500">
+                  {chartData.data[0].values.reduce((a, b) => a + b, 0)}
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-gray-500">Total Wildfires</p>
+                <p className="text-lg font-semibold text-red-500">
+                  {chartData.data[1].values.reduce((a, b) => a + b, 0)}
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-gray-500">Total Storms</p>
+                <p className="text-lg font-semibold text-purple-500">
+                  {chartData.data[2].values.reduce((a, b) => a + b, 0)}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Modern Alert Status Card */}
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-4">
+          {/* Header with subtle gradient */}
+          <div className="bg-gradient-to-r from-gray-800 to-gray-700 p-3 text-white">
+            <div className="flex items-center">
+              <Activity className="h-5 w-5 mr-2" />
+              <h3 className="font-medium">Alert Status</h3>
+            </div>
+          </div>
+
+          <div className="p-4">
+            <div className="space-y-3 text-left">
+              {/* Low Risk - Modern Card */}
+              <div className="group flex items-center  justify-between p-3 bg-gradient-to-r from-green-50 to-green-50/50 rounded-xl border border-green-100 hover:shadow-md transition-all duration-200">
+                <div className="flex items-center ">
+                  <div className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                    <Shield className="h-4 w-4 text-green-500" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-green-700">
+                      Low Risk
+                    </p>
+                    <p className="text-xs text-green-600/70">
+                      Normal operational status
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center">
+                  <span className="px-3 py-1 rounded-full text-xs font-medium text-green-600 bg-green-100 flex items-center">
+                    3 <span className="ml-1 hidden sm:inline">regions</span>
+                  </span>
+                </div>
+              </div>
+
+              {/* Medium Risk - Modern Card */}
+              <div className="group flex items-center justify-between p-3 bg-gradient-to-r from-yellow-50 to-yellow-50/50 rounded-xl border border-yellow-100 hover:shadow-md transition-all duration-200">
+                <div className="flex items-center">
+                  <div className="w-9 h-9 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
+                    <Activity className="h-4 w-4 text-yellow-500" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-yellow-700">
+                      Medium Risk
+                    </p>
+                    <p className="text-xs text-yellow-600/70">
+                      Enhanced monitoring active
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center">
+                  <span className="px-3 py-1 rounded-full text-xs font-medium text-yellow-600 bg-yellow-100 flex items-center">
+                    5 <span className="ml-1 hidden sm:inline">regions</span>
+                  </span>
+                </div>
+              </div>
+
+              {/* High Risk - Modern Card with attention-grabbing element */}
+              <div className="group flex items-center justify-between p-3 bg-gradient-to-r from-red-50 to-red-50/50 rounded-xl border border-red-100 hover:shadow-md transition-all duration-200">
+                <div className="flex items-center">
+                  <div className="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center mr-3 relative">
+                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping opacity-75"></span>
+                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+                    <Bell className="h-4 w-4 text-red-500" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-red-700">
+                      High Risk
+                    </p>
+                    <p className="text-xs text-red-600/70">
+                      Immediate attention required
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center ">
+                  <span className="px-3 py-1 rounded-full text-xs font-medium text-red-600 bg-red-100 flex items-center">
+                    2 <span className="ml-1 hidden sm:inline">regions</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Optional view all button */}
+            <button className="w-full mt-3 text-xs  text-gray-500 hover:text-gray-700 font-medium flex items-center justify-center">
+              View detailed risk assessment
+              <svg
+                className="ml-1 w-3 h-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                <Plus className="mr-2" /> Create Post
-              </button>
-              <button
-                onClick={() => setViewMode("list")}
-                className={`interactive-button p-2 rounded-md transition-all duration-300 ${
-                  viewMode === "list"
-                    ? "bg-green-100 text-green-500"
-                    : "text-gray-600 hover:bg-primary-50"
-                }`}
-              >
-                <LayoutList className="h-5 w-5" />
-              </button>
-              <button
-                onClick={() => setViewMode("grid")}
-                className={`interactive-button p-2 rounded-md transition-all duration-300 ${
-                  viewMode === "grid"
-                    ? "bg-green-100 text-green-500"
-                    : "text-gray-600 hover:bg-primary-50"
-                }`}
-              >
-                <LayoutGrid className="h-5 w-5" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-4">
+          {/* Header with gradient */}
+          <div className="bg-gradient-to-r from-slate-700 to-slate-800 p-3 text-white">
+            <div className="flex items-center">
+              <Activity className="h-5 w-5 mr-2" />
+              <h3 className="font-medium">Recent Activity</h3>
+            </div>
+          </div>
+
+          <div className="p-4">
+            <div className="space-y-4">
+              {[
+                {
+                  icon: Bell,
+                  color: "text-blue-500 bg-blue-50",
+                  title: "Flood warning updated",
+                  time: "2h ago",
+                  location: "Eastern Province",
+                },
+                {
+                  icon: Users,
+                  color: "text-green-500 bg-green-50",
+                  title: "5 new volunteers joined",
+                  time: "5h ago",
+                  location: "Colombo Region",
+                },
+                {
+                  icon: MapPin,
+                  color: "text-red-500 bg-red-50",
+                  title: "New evacuation route added",
+                  time: "1d ago",
+                  location: "Southern Province",
+                },
+              ].map((item, index) => (
+                <div
+                  key={index}
+                  className="flex items-start space-x-3 p-2 text-left rounded-lg hover:bg-gray-50 transition-all duration-200"
+                >
+                  <div
+                    className={`w-10 h-10 rounded-full ${item.color.split(" ")[1]} flex items-center justify-center flex-shrink-0 shadow-sm`}
+                  >
+                    <item.icon
+                      className={`h-5 w-5 ${item.color.split(" ")[0]}`}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-800">
+                      {item.title}
+                    </p>
+                    <div className="flex items-center mt-1.5">
+                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full mr-2">
+                        {item.time}
+                      </span>
+                      <span className="text-xs text-gray-500 flex items-center">
+                        <MapPin className="h-3 w-3 mr-0.5" /> {item.location}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-gray-100">
+              <button className="w-full  text-xs  text-gray-500 hover:text-gray-700 font-medium flex items-center justify-center">
+                View all activity
+                <svg
+                  className="ml-1 w-3 h-3"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
               </button>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-row  gap-8   ">
-          {/* Left Sidebar - Sticky */}
-          <div className="hidden lg:block lg:fixed top-4 flex-shrink-0 h-screen w-[300px]">
-            <div className="sticky top-28 space-y-6 ">
-              <SidebarMenu
-                items={SIDE_MENU_ITEMS}
-                title="Quick Access"
-                className="border-b border-gray-200 pb-2"
-              />
-              <DisasterTypes items={disasterTypes} />
-            </div>
-          </div>
+        {/* Community Heroes */}
+        <div className="bg-white rounded-xl shadow-sm p-4">
+          <h3 className="font-medium text-gray-800 mb-3 ">Community Heroes</h3>
 
-          {/* Main Content */}
-          <div
-            className={`flex-1 pl-4 pr-10 pt-[80px] ml-[260px] mr-[260px]  ${viewMode === "list" ? "space-y-8" : "grid grid-cols-1 md:grid-cols-2 gap-8"}`}
-          >
-            {posts.map((post) => (
-              <PostCard key={post._id} post={post} />
+          <div className="space-y-3">
+            {[
+              {
+                name: "Sarah Johnson",
+                contribution: "Rescued 5 families during floods",
+                avatar: "SJ",
+              },
+              {
+                name: "Mike Chen",
+                contribution: "Organized emergency supplies",
+                avatar: "MC",
+              },
+              {
+                name: "Priya Sharma",
+                contribution: "Created evacuation maps",
+                avatar: "PS",
+              },
+            ].map((hero, index) => (
+              <div key={index} className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-medium text-sm">
+                  {hero.avatar}
+                </div>
+                <div>
+                  <p className="text-sm text-gray-800 font-medium text-left">
+                    {hero.name}
+                  </p>
+                  <p className="text-xs text-gray-500">{hero.contribution}</p>
+                </div>
+              </div>
             ))}
           </div>
 
-          {/* Right Sidebar - Sticky, Hidden in Grid View */}
-          <div
-            className={`hidden pt-[90px] ${viewMode === "list" ? "xl:block fixed right-0 " : ""} w-80 flex-shrink-0`}
-          >
-            <div className="sticky top-28 space-y-6">
-              <div className="glass-card text-left rounded-xl p-4 ">
-                <h2 className="font-semibold text-[16px] ml-4 text-gray-900 mb-4 border-b border-gray-200 pb-2">
-                  Emergency Contacts
-                </h2>
-                <div className="space-y-3 mx-4">
-                  <button className="interactive-button w-full flex items-center space-x-3 p-2 rounded-lg">
-                    <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
-                      <span className="text-red-600 font-semibold">911</span>
-                    </div>
-                    <div className="text-left ">
-                      <p className="font-medium text-[14px] text-gray-900">
-                        Emergency Services
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        For immediate assistance
-                      </p>
-                    </div>
-                  </button>
-                  <button className="interactive-button w-full flex items-center space-x-3 p-2 rounded-lg">
-                    <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
-                      <Shield className="h-6 w-6 text-primary-600" />
-                    </div>
-                    <div className="text-left">
-                      <p className="font-medium text-gray-900 text-[14px]">
-                        Local Police
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        Non-emergency: 555-0123
-                      </p>
-                    </div>
-                  </button>
-                </div>
-              </div>
+          <button className="w-full mt-4 text-xs py-2 border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-600 font-medium">
+            Become a volunteer
+          </button>
+        </div>
+      </div>
+    );
+  };
 
-              <div className="glass-card rounded-xl p-4 mx-3">
-                <h2 className="font-semibold text-gray-900 pl-2 mr-2 mb-4 border-b text-left text-[16px] border-gray-200 pb-2">
-                  Weather Updates
-                </h2>
-                <div className="space-y-2 text-[14px]">
-                  {weather.loading ? (
-                    <div className="text-gray-400">Loading weather...</div>
-                  ) : weather.error ? (
-                    <div className="text-red-400">{weather.error}</div>
-                  ) : (
-                    <>
-                      <div className="flex items-center justify-between p-2 hover:bg-primary-50 rounded-lg transition-all duration-300">
-                        <span className="text-gray-600">Temperature</span>
-                        <span className="font-medium text-gray-900">
-                          {weather.temperature}°C
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between p-2 hover:bg-primary-50 rounded-lg transition-all duration-300">
-                        <span className="text-gray-600">Wind Speed</span>
-                        <span className="font-medium text-gray-900">
-                          {weather.windSpeed} km/h
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between p-2 hover:bg-primary-50 rounded-lg transition-all duration-300">
-                        <span className="text-gray-600">Precipitation</span>
-                        <span className="font-medium text-gray-900">
-                          {weather.precipitation} mm
-                        </span>
-                      </div>
-                    </>
+  return (
+    <div className="min-h-screen bg-gray-50 w-full ">
+      {/* Header */}
+
+      <header className="sticky top-0 z-50 ">
+        <div className=" mx-5">
+          {/* Main Header Content */}
+          <div className="px-4 py-2 flex justify-between items-center">
+            <div className="flex items-center space-x-2">
+              <Shield className="h-8 w-8 text-green-600" />
+              <h1 className="text-xl font-semibold text-gray-900">
+                GuardianEarth
+              </h1>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              {/* Search Bar - New sticky top search */}
+              <div className="relative  border-gray-100 py-2 px-4  min-w-[350px] text-[14px]">
+                <div className="relative w-full">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search disasters, locations, categories..."
+                    className="w-full pl-10 pr-4 py-2 border h-[35px] outline-none ring-0 border-gray-200 rounded-lg bg-gray-50 focus:ring-1 focus:ring-green-500 focus:border-transparent focus:bg-white transition-colors"
+                    ref={searchInputRef}
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                    >
+                      <X className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                    </button>
                   )}
                 </div>
               </div>
+
+              <button
+                onClick={() => setIsAddModalOpen(true)}
+                className="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-md px-4 py-1.5 text-sm font-medium flex items-center"
+              >
+                <Plus className="h-4 w-4 mr-1.5" /> Report
+              </button>
+              <button className="text-gray-500 hover:text-gray-700">
+                <Bell className="h-6 w-6" />
+              </button>
             </div>
           </div>
         </div>
-      </div>
+      </header>
+
+      <main className=" mx-auto px-4 grid grid-cols-1 md:grid-cols-[330px_2fr_1fr] gap-4 overflow-hidden max-h-[calc(100vh-5rem)] scrollbar-hide ">
+        {/* Left Sidebar - For Tablet & Desktop */}
+        <div className="hidden md:block md:col-span-1  ">
+          <div className="sticky top-0 max-h-[calc(100vh-6rem)] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-100 pr-2 scrollbar-track-gray-50 scrollbar-thumb-rounded-full ">
+            {/* <div className="bg-white rounded-xl shadow-sm p-4 mb-4">
+              <h3 className="font-medium text-gray-900 mb-3">Disaster Types</h3>
+              <hr className="my-2 border-t border-gray-100" />
+
+              <div className="space-y-1">
+                {[
+                  {
+                    icon: Droplets,
+                    label: "Floods",
+                    count: 12,
+                    color: "text-blue-500 bg-blue-50",
+                  },
+                  {
+                    icon: CloudLightning,
+                    label: "Storms",
+                    count: 7,
+                    color: "text-purple-500 bg-purple-50",
+                  },
+                  {
+                    icon: Flame,
+                    label: "Wildfires",
+                    count: 3,
+                    color: "text-red-500 bg-red-50",
+                  },
+                ].map((item, index) => (
+                  <button
+                    key={index}
+                    className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex items-center">
+                      <div
+                        className={`w-8 h-8 rounded-lg ${item.color.split(" ")[1]} flex items-center justify-center mr-2`}
+                      >
+                        <item.icon
+                          className={`h-4 w-4 ${item.color.split(" ")[0]}`}
+                        />
+                      </div>
+                      <span className="text-sm text-gray-700">
+                        {item.label}
+                      </span>
+                    </div>
+                    <span className="text-xs font-medium bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                      {item.count}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div> */}
+            <div className="bg-white rounded-lg shadow-sm p-5 mb-4">
+              <h3 className="font-medium text-gray-800 mb-4   ">
+                Disaster Types
+              </h3>
+
+              <div className="space-y-2">
+                {[
+                  {
+                    icon: Flame,
+                    label: "Wildfires",
+                    count: 3,
+                    color: "text-red-500",
+                  },
+                  {
+                    icon: Droplets,
+                    label: "Floods",
+                    count: 12,
+                    color: "text-blue-500",
+                  },
+                  {
+                    icon: CloudLightning,
+                    label: "Storms",
+                    count: 7,
+                    color: "text-purple-500",
+                  },
+                ].map((item, index) => (
+                  <button
+                    key={index}
+                    className="flex items-center justify-between w-full p-2.5 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex items-center">
+                      <item.icon className={`h-4 w-4 ${item.color} mr-3`} />
+                      <span className="text-sm text-gray-600">
+                        {item.label}
+                      </span>
+                    </div>
+                    <span className="text-xs text-gray-500">{item.count}</span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <button className="text-xs text-gray-500 hover:text-gray-700 font-medium">
+                  View all categories
+                </button>
+              </div>
+            </div>
+
+            {/* <div className="bg-white rounded-xl shadow-sm p-4">
+              <h3 className="font-medium text-gray-900 mb-3">
+                Weather Updates
+              </h3>
+              {weather.loading ? (
+                <div className="animate-pulse">
+                  <div className="h-10 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-10 bg-gray-200 rounded"></div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mr-3">
+                      <CloudRain className="h-5 w-5 text-blue-500" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Temperature</p>
+                      <p className="text-lg font-medium text-gray-900">
+                        {weather.temperature}°C
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center mr-3">
+                      <Wind className="h-5 w-5 text-gray-500" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Wind Speed</p>
+                      <p className="text-lg font-medium text-gray-900">
+                        {weather.windSpeed} km/h
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div> */}
+            <div className="bg-white rounded-xl overflow-hidden shadow-sm">
+              {/* Weather Card Header with Gradient */}
+              <div className="bg-gradient-to-r from-blue-500 to-sky-400 p-2 text-white">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium">Weather Updates</h3>
+                  <span className="text-xs opacity-80">Colombo, Sri Lanka</span>
+                </div>
+              </div>
+
+              {weather.loading ? (
+                <div className="p-6 animate-pulse space-y-4">
+                  <div className="h-12 bg-gray-200 rounded-lg mb-2"></div>
+                  <div className="h-12 bg-gray-200 rounded-lg"></div>
+                </div>
+              ) : (
+                <div className="p-5">
+                  {/* Main Weather Display */}
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center mr-4 shadow-sm">
+                        <CloudRain className="h-8 w-8 text-blue-500" />
+                      </div>
+                      <div>
+                        <p className="text-3xl font-bold text-gray-800">
+                          {weather.temperature}°C
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Feels like {Math.round(weather.temperature - 2)}°C
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="text-right">
+                      <p className="text-sm font-medium text-gray-600">Today</p>
+                      <p className="text-xs text-gray-500">
+                        {new Date().toLocaleDateString("en-US", {
+                          weekday: "short",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Weather Details */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-3 bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-100">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center mr-3">
+                          <Wind className="h-4 w-4 text-blue-500" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500">Wind Speed</p>
+                          <p className="text-base font-semibold text-gray-800">
+                            {weather.windSpeed}{" "}
+                            <span className="text-xs font-normal">km/h</span>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-100">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center mr-3">
+                          <Droplets className="h-4 w-4 text-blue-500" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500">Humidity</p>
+                          <p className="text-base font-semibold text-gray-800">
+                            {Math.round(Math.random() * 30 + 50)}%{" "}
+                            {/* Placeholder value */}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Forecast Hint */}
+                  <div className="mt-4 text-center">
+                    <button className="text-xs text-blue-500 hover:text-blue-700 font-medium flex items-center justify-center mx-auto">
+                      View 5-day forecast
+                      <svg
+                        className="w-3 h-3 ml-1"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Main Feed */}
+        <div className="col-span-1 md:col-span-1 max-h-screen overflow-y-auto pb-10 scrollbar-thin scrollbar-thumb-gray-300">
+          {/* Stories */}
+          <DisasterStories />
+
+          {/* Feed */}
+          {loading ? (
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="bg-white rounded-xl shadow-sm p-4 animate-pulse"
+                >
+                  <div className="flex items-center mb-4">
+                    <div className="w-10 h-10 bg-gray-200 rounded-full mr-3"></div>
+                    <div className="flex-1">
+                      <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/5"></div>
+                    </div>
+                  </div>
+                  <div className="h-48 bg-gray-200 rounded-lg mb-4"></div>
+                  <div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-full"></div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {filteredPosts.map((post) => (
+                <PostCard
+                  key={post._id}
+                  post={post}
+                  handleAddComment={handleAddComment}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Right Sidebar - For Tablet & Desktop */}
+        <div className="hidden md:block col-span-1">
+          <RightSidebar />
+        </div>
+      </main>
+
+      {/* Modal for creating new post */}
       <Modal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        title="Create New Post"
+        title="Report Disaster"
       >
         <PostForm
           onPostCreated={handlePostCreated}

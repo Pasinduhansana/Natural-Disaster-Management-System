@@ -122,10 +122,10 @@ const Payment_Grid = ({
                 <div
                   className={`text-[13px] flex max-w-fit px-2 items-center justify-center rounded-[20px] h-[22px] font-normal text-text-secondary ${
                     payment.status === "Successful"
-                      ? "bg-[#bfffd3]"
+                      ? "bg-[#c8fbd9]"
                       : payment.status === "Failed"
-                        ? "bg-[#ffd4df]"
-                        : "bg-[#fff5b5]"
+                        ? "bg-[#f9dee5]"
+                        : "bg-[#f6efc2]"
                   }`}
                 >
                   <div className="flex flex-row items-center">

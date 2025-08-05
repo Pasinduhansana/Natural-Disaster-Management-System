@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -6,6 +6,7 @@ import InputMask from "react-input-mask";
 import { MapPin, AlertCircle, Loader2 } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 import { FaImage } from "react-icons/fa";
+import { AuthContext } from "../../context/AuthContext";
 
 const formatDate = (dateString) => {
   const dateObj = new Date(dateString);
@@ -21,6 +22,7 @@ const AddDisaster = ({
   onDisasterClosed,
   onDisasterSuccess,
 }) => {
+  const { user } = useContext(AuthContext);
   const [inputs, setInputs] = useState({
     type: "",
     severity: "",
@@ -152,6 +154,13 @@ const AddDisaster = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    console.log(user);
+
+    if (!user) {
+      toast.error("You must be logged in to add a disaster.");
+      return;
+    }
+
     if (!validateForm()) {
       toast.error("Please fill in all required fields");
       return;
@@ -165,12 +174,19 @@ const AddDisaster = ({
 
   const createPost = async () => {
     try {
+      const payload = {
+        ...inputs,
+        user: user.name, // or user.username, depending on your user object
+        email: user.email,
+        userImage: user.profile_img,
+      };
+
       const response = await fetch("http://localhost:5000/api/disaster", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(inputs),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
@@ -188,6 +204,12 @@ const AddDisaster = ({
 
   const updatePost = async () => {
     try {
+      const payload = {
+        ...inputs,
+        user: user.name, // or user.username, depending on your user object
+        email: user.email,
+        userImage: user.profile_img,
+      };
       const response = await fetch(
         `http://localhost:5000/api/disaster/${inputs._id}`,
         {
@@ -195,7 +217,7 @@ const AddDisaster = ({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(inputs),
+          body: JSON.stringify(payload),
         }
       );
 
@@ -311,7 +333,6 @@ const AddDisaster = ({
               name="severityLevel"
               value={inputs.severity}
               onChange={handleChange}
-                            
               className={`w-full px-3 py-2 text-sm  ring-0 outline-none rounded-lg border ${
                 errors.severity ? "border-red-500" : "border-gray-200"
               } focus:border-green-500 transition-colors duration-200 bg-white/50 backdrop-blur-sm`}
