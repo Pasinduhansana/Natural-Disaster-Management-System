@@ -30,6 +30,9 @@ export const insertDisaster = async (req, res, next) => {
     date,
     Location,
     contact,
+    user,
+    email,
+    userImage,
   } = req.body;
 
   let createdDisaster;
@@ -45,6 +48,9 @@ export const insertDisaster = async (req, res, next) => {
       Location,
       contact,
       status: "Pending",
+      user,
+      email,
+      userImage,
     });
     await createdDisaster.save();
   } catch (error) {
@@ -90,6 +96,9 @@ export const updateDisaster = async (req, res, next) => {
     date,
     Location,
     contact,
+    user,
+    email,
+    userImage,
   } = req.body;
 
   const id = req.params.id;
@@ -107,6 +116,9 @@ export const updateDisaster = async (req, res, next) => {
       Location,
       contact,
       status: "Pending",
+      user,
+      email,
+      userImage,
     });
     disaster = await disaster.save();
   } catch (err) {

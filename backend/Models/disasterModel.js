@@ -38,6 +38,17 @@ const disasterSchema = new mongoose.Schema({
     enum: ["Pending", "Approved", "Rejected"],
     default: "Pending",
   },
+  user: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+  },
+  userImage: {
+    type: String,
+  },
 });
 
 const disaster = mongoose.model("Disaster", disasterSchema);

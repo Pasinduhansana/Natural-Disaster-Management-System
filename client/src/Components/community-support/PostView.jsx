@@ -17,6 +17,9 @@ import {
   Flame,
   Plus,
   Send,
+  CloudLightning,
+  CloudRain,
+  Tornado,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Modal from "../main-components/Model";

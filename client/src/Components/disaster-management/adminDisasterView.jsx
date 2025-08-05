@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaEdit, FaTrash, FaSearch, FaCalendarAlt } from "react-icons/fa";
+import { BentoGrid, BentoGridItem } from "../ui/bento-grid";
 import { Plus, LayoutGrid, List, Map } from "lucide-react";
 import { format } from "date-fns";
 import { Toaster, toast } from "react-hot-toast";
@@ -400,7 +401,23 @@ const AdminDisasterView = () => {
             No records found.
           </div>
         ) : viewMode === "grid" ? (
-          <GridView />
+          <BentoGrid className="w-full z-20">
+            {filteredDisasters.map((disaster, i) => (
+              <BentoGridItem
+                key={disaster._id}
+                title={disaster.disasterType}
+                description={disaster.description}
+                header={disaster.severityLevel}
+                icon={disaster.images}
+                data={disaster}
+                navigation={() => {}}
+                type="admin"
+                approveDisaster={approveDisaster}
+                rejectDisaster={rejectDisaster}
+                className={i === 3 || i === 6 ? "md:col-span-2" : ""}
+              />
+            ))}
+          </BentoGrid>
         ) : (
           <TableView />
         )}
@@ -435,6 +452,7 @@ const AdminDisasterView = () => {
           onDisasterClosed={() => setIsEditModalOpen(false)}
         />
       </Modal>
+
       <Modal
         isOpen={!!imageModalUrl}
         onClose={() => setImageModalUrl(null)}
