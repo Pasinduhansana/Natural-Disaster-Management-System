@@ -23,6 +23,7 @@
 		"@material-tailwind/react": "^2.1.10",
 		"@mui/icons-material": "^6.4.8",
 		"@mui/material": "^6.4.8",
+		"@radix-ui/react-hover-card": "^1.1.14",
 		"@reduxjs/toolkit": "^2.4.0",
 		"@stripe/react-stripe-js": "^3.3.0",
 		"@stripe/stripe-js": "^5.8.0",
@@ -61,6 +62,7 @@
 		"react-select": "^5.10.1",
 		"recharts": "^2.15.1",
 		"redux-persist": "^6.0.0",
+		"shadcn-ui": "^0.9.5",
 		"tailwind-merge": "^3.3.1",
 		"three": "^0.174.0",
 		"xlsx": "^0.18.5"
