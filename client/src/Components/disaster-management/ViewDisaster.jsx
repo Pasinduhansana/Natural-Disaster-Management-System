@@ -76,7 +76,16 @@ export default function ViewDisasters() {
         throw new Error(data.message || "Failed to fetch disaster");
       }
 
-      setDisasterData(data || []);
+      // Use the freshly fetched data for filtering
+      const visibleDisasters = !isAuthenticated
+        ? (data.disasters || []).filter((d) => d.status === "Approved")
+        : (data.disasters || []).filter(
+            (d) =>
+              d.status === "Approved" ||
+              (d.status === "Pending" && d.email === user?.email)
+          );
+
+      setDisasterData(visibleDisasters || []);
     } catch (error) {
       toast.error("Error fetching disasters:", error.message);
       console.error("Error fetching disasters:", error.message);
@@ -504,8 +513,8 @@ export default function ViewDisasters() {
                 <Skeleton viewMode={viewMode} />
               )
             ) : viewMode === "list" ? (
-              disasterData.disasters && disasterData.disasters.length > 0 ? (
-                disasterData.disasters.map((disaster) => (
+              disasterData && disasterData.length > 0 ? (
+                disasterData.map((disaster) => (
                   <ListCard
                     key={disaster._id}
                     data={disaster}
@@ -515,9 +524,9 @@ export default function ViewDisasters() {
               ) : (
                 <p className="text-gray-500">No disaster reports available.</p>
               )
-            ) : disasterData.disasters && disasterData.disasters.length > 0 ? (
+            ) : disasterData && disasterData.length > 0 ? (
               <BentoGrid className="w-full z-20">
-                {disasterData.disasters.map((disaster, i) => (
+                {disasterData.map((disaster, i) => (
                   <BentoGridItem
                     key={disaster._id}
                     title={disaster.disasterType}
@@ -525,6 +534,7 @@ export default function ViewDisasters() {
                     header={disaster.severityLevel}
                     icon={disaster.images}
                     data={disaster}
+                    type="user"
                     navigation={navigate}
                     className={i === 3 || i === 6 ? "md:col-span-2" : ""}
                   />
