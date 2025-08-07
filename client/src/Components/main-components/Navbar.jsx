@@ -105,7 +105,7 @@ function Navbar() {
           {
             name: "Disaster",
             link: "/admin/Disaster",
-            icon: <CircleDollarSign className="w-4 h-4" />,
+            icon: <Info className="w-4 h-4" />,
           },
           {
             name: "Funding",

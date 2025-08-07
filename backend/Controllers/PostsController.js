@@ -175,7 +175,7 @@ export const handleLike = async (req, res) => {
 //handle comments
 export const handleComment = async (req, res) => {
   const { postId } = req.params;
-  const { userId, text } = req.body;
+  const { userId, text, profile_img } = req.body;
 
   try {
     const post = await Posts.findById(postId);
@@ -188,6 +188,7 @@ export const handleComment = async (req, res) => {
     const newComment = {
       user: userId,
       text,
+      profile_img: profile_img || "default_profile.png",
       createdAt: new Date(),
     };
 
@@ -197,7 +198,7 @@ export const handleComment = async (req, res) => {
     // Return updated post with comments
     return res.status(200).json(post);
   } catch (err) {
-    console.error(err);
+    console.error("Error adding comment:", err);
     return res.status(500).json({ message: "Server error" });
   }
 };

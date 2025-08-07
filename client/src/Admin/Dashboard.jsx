@@ -434,15 +434,14 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="bg-gradient-to-br from-gray-50 to-gray-200 min-h-screen text-gray-800">
+      <div className="bg-gradient-to-br  from-gray-50 to-gray-200 min-h-screen text-gray-800">
         <div className="flex">
           <div className="flex-1 px-8 py-4">
             {/* Header */}
             <div className="flex justify-between items-center mb-8">
               <div className="text-left">
                 <h1 className="text-2xl font-bold tracking-tight text-gray-900 mb-1">
-                  GUARDIAN EARTH{" "}
-                  <span className="text-green-600">DASHBOARD</span>
+                  Dashboard Analysis
                 </h1>
                 <p className="text-gray-500 text-[14px]">
                   Monitor, alert, and track resources for effective response.

@@ -25,6 +25,7 @@ const postsSchema = new mongoose.Schema(
       {
         user: String,
         text: String,
+        profile_img: { type: String, default: "default_profile.png" },
         createdAt: { type: Date, default: Date.now },
       },
     ],

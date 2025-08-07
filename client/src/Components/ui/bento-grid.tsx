@@ -46,7 +46,7 @@ export const BentoGridItem = ({
       className={cn(
         "group/bento shadow-input row-span-1 flex flex-col justify-between  rounded-xl border border-neutral-200 bg-white transition duration-200 hover:shadow-xl dark:border-white/[0.2] dark:bg-black dark:shadow-none",
         className,
-        "h-[430px]" // <-- Change this value to your desired card height
+        type === "admin" ? "h-[430px]" : "h-[400px]" // <-- Change this value to your desired card height
       )}
     >
       <div className="transition duration-200  group-hover/bento:border-green-400 border-1">

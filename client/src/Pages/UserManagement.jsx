@@ -349,7 +349,7 @@ export const UserManagement = () => {
             <h1 className="text-2xl font-bold text-gray-900">
               User Management
             </h1>
-            <p className="text-gray-500 mt-1">
+            <p className="text-gray-500 text-[14px]">
               Manage your organization's users, roles, and permissions
             </p>
           </div>
